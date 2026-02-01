@@ -718,12 +718,17 @@
         </div>
 
         <div class="links">
-            <a href="#" class="link-item"><i class="fab fa-instagram"></i><span>Instagram</span></a>
-            <a href="#" class="link-item"><i class="fab fa-spotify"></i><span>Spotify</span></a>
-            <a href="#" class="link-item"><i class="fab fa-github"></i><span>GitHub</span></a>
-            <a href="#" class="link-item"><i class="fab fa-x-twitter"></i><span>Twitter / X</span></a>
-            <a href="#" class="link-item"><i class="fas fa-pen-fancy"></i><span>Poetry</span></a>
-            <a href="#" class="link-item"><i class="fas fa-envelope"></i><span>Contact</span></a>
+            <a href="https://instagram.com/abhinaba.75" target="_blank" class="link-item"><i
+                    class="fab fa-instagram"></i><span>Instagram</span></a>
+            <a href="https://open.spotify.com/playlist/2RVcgdgbT7x5MQCWkMLqNY?si=65b2711e808b4bb8" target="_blank"
+                class="link-item"><i class="fab fa-spotify"></i><span>Spotify</span></a>
+            <a href="https://github.com/abhinaba75" target="_blank" class="link-item"><i
+                    class="fab fa-github"></i><span>GitHub</span></a>
+            <a href="https://x.com/abhinaba_75" target="_blank" class="link-item"><i
+                    class="fab fa-x-twitter"></i><span>X / Twitter</span></a>
+            <a href="javascript:void(0)" onclick="copyDiscord()" class="link-item"><i class="fab fa-discord"></i><span
+                    id="discordText">Discord</span></a>
+            <a href="mailto:abhinaba@duck.com" class="link-item"><i class="fas fa-envelope"></i><span>Contact</span></a>
         </div>
 
         <div class="divider"></div>
@@ -755,6 +760,16 @@
         const mainPage = document.getElementById('mainPage');
         const waveCanvas = document.getElementById('waveCanvas');
         const waveCtx = waveCanvas.getContext('2d');
+
+        // Discord copy function
+        function copyDiscord() {
+            navigator.clipboard.writeText('e075').then(() => {
+                const text = document.getElementById('discordText');
+                text.textContent = 'Copied: e075';
+                setTimeout(() => { text.textContent = 'Discord'; }, 2000);
+            });
+        }
+        window.copyDiscord = copyDiscord;
 
         // Canvas sizing
         function resizeWave() {
