@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABHINABA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --silver: #d0d0d0;
+            --silver-bright: #ffffff;
+            --silver-glow: rgba(208, 208, 208, 0.9);
+            --silver-mid: rgba(192, 192, 192, 0.5);
+            --silver-dim: rgba(180, 180, 180, 0.2);
+            --silver-faint: rgba(192, 192, 192, 0.05);
+            --black: #000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--black);
+            font-family: 'Share Tech Mono', monospace;
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        ::selection {
+            background: var(--silver);
+            color: var(--black);
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--black);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--silver-dim);
+        }
+
+        /* Retro Fighter Plane Cursor */
+        .fighter {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            font-size: 28px;
+            filter: drop-shadow(0 0 8px var(--silver));
+            transition: transform 0.05s ease;
+        }
+
+        /* Bullets */
+        .bullet {
+            position: fixed;
+            width: 3px;
+            height: 12px;
+            background: var(--silver);
+            pointer-events: none;
+            z-index: 9998;
+            box-shadow: 0 0 8px var(--silver), 0 0 15px var(--silver-mid);
+            border-radius: 2px;
+        }
+
+        /* Aliens */
+        .alien {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9997;
+            font-size: 24px;
+            color: var(--silver);
+            filter: drop-shadow(0 0 8px var(--silver-mid));
+            transition: transform 0.3s ease;
+        }
+
+        /* Explosion */
+        .explosion {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            font-size: 30px;
+            animation: explode 0.3s ease-out forwards;
+        }
+
+        @keyframes explode {
+            0% {
+                transform: scale(0.5);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        /* Spooky ASCII Monster */
+        .monster-container {
+            position: fixed;
+            z-index: 8000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .monster {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 10px;
+            line-height: 1;
+            white-space: pre;
+            filter: drop-shadow(0 0 8px currentColor);
+        }
+
+        .monster-speech {
+            position: relative;
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid var(--silver);
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--silver);
+            max-width: 260px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(208, 208, 208, 0.5);
+            animation: speechPulse 1s infinite;
+        }
+
+        .monster-speech::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 10px solid transparent;
+            border-top-color: var(--silver);
+        }
+
+        .monster-speech .ip {
+            color: var(--silver-bright);
+            font-weight: bold;
+            text-shadow: 0 0 15px var(--silver);
+        }
+
+        @keyframes speechPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(208, 208, 208, 0.5);
+            }
+
+            50% {
+                box-shadow: 0 0 40px rgba(208, 208, 208, 0.8);
+            }
+        }
+
+        /* Wave Visualizer */
+        #waveCanvas {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 150px;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* Grid */
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                linear-gradient(90deg, rgba(192, 192, 192, 0.02) 1px, transparent 1px),
+                linear-gradient(rgba(192, 192, 192, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Noise */
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+        /* Vignette */
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 99;
+            background: radial-gradient(ellipse at center, transparent 0%, transparent 30%, rgba(0, 0, 0, 0.8) 100%);
+        }
+
+        /* GLITCH OVERLAY */
+        .glitch-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2000;
+            opacity: 0;
+            background: var(--black);
+        }
+
+        .glitch-overlay.active {
+            opacity: 1;
+        }
+
+        .glitch-lines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2001;
+            opacity: 0;
+            overflow: hidden;
+        }
+
+        .glitch-lines.active {
+            opacity: 1;
+        }
+
+        .glitch-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: var(--silver);
+            left: 0;
+        }
+
+        /* BSOD Style */
+        .bsod {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0078d4;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+            padding: 40px;
+        }
+
+        .bsod.active {
+            display: flex;
+        }
+
+        .bsod-sad {
+            font-size: 8rem;
+            margin-bottom: 20px;
+        }
+
+        .bsod-text {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .bsod-small {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Enter Screen */
+        .enter-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--black);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 500;
+            transition: opacity 1s ease;
+        }
+
+        .enter-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .enter-frame {
+            position: relative;
+            padding: 50px 80px;
+            border: 1px solid var(--silver-dim);
+        }
+
+        .enter-frame::before,
+        .enter-frame::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+        }
+
+        .enter-frame::before {
+            top: -1px;
+            left: -1px;
+            border-top: 2px solid var(--silver);
+            border-left: 2px solid var(--silver);
+        }
+
+        .enter-frame::after {
+            bottom: -1px;
+            right: -1px;
+            border-bottom: 2px solid var(--silver);
+            border-right: 2px solid var(--silver);
+        }
+
+        .enter-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.5rem, 4vw, 2.2rem);
+            font-weight: 700;
+            color: var(--silver);
+            letter-spacing: 15px;
+            text-shadow: 0 0 30px var(--silver-glow);
+        }
+
+        .enter-sub {
+            margin-top: 30px;
+            font-size: 0.65rem;
+            color: var(--silver-dim);
+            letter-spacing: 8px;
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        /* Main Page */
+        .main-page {
+            position: relative;
+            min-height: 100vh;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            padding: 80px 20px;
+            z-index: 10;
+        }
+
+        .main-page.active {
+            display: flex;
+            animation: fadeIn 1s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Glitch state for page */
+        .page-glitch {
+            animation: pageGlitch 0.2s ease;
+        }
+
+        @keyframes pageGlitch {
+            0% {
+                transform: translate(0);
+                filter: none;
+            }
+
+            20% {
+                transform: translate(-5px, 3px) skewX(2deg);
+                filter: hue-rotate(90deg);
+            }
+
+            40% {
+                transform: translate(5px, -3px) skewX(-2deg);
+                filter: saturate(2);
+            }
+
+            60% {
+                transform: translate(-3px, -2px);
+                filter: invert(1);
+            }
+
+            80% {
+                transform: translate(3px, 2px) skewY(1deg);
+                filter: brightness(2);
+            }
+
+            100% {
+                transform: translate(0);
+                filter: none;
+            }
+        }
+
+        /* Name with individual letters */
+        .name-container {
+            position: relative;
+            margin-bottom: 30px;
+            perspective: 1000px;
+        }
+
+        .name {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .letter {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(3rem, 15vw, 8rem);
+            font-weight: 900;
+            color: var(--silver);
+            display: inline-block;
+            text-shadow: 0 0 30px var(--silver-glow);
+            transition: transform 0.05s ease;
+            transform-origin: bottom center;
+        }
+
+        .tagline {
+            font-size: 0.8rem;
+            color: var(--silver-mid);
+            letter-spacing: 6px;
+            margin-bottom: 50px;
+        }
+
+        .tagline .hl {
+            color: var(--silver);
+        }
+
+        .bio {
+            max-width: 450px;
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 25px 35px;
+            background: var(--silver-faint);
+            border: 1px solid var(--silver-dim);
+            position: relative;
+        }
+
+        .bio::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 20%;
+            width: 60%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--silver), transparent);
+        }
+
+        .bio p {
+            font-size: 0.8rem;
+            color: var(--silver-mid);
+            line-height: 2;
+        }
+
+        .bio .accent {
+            color: var(--silver);
+        }
+
+        .links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            max-width: 360px;
+        }
+
+        .link-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 16px 24px;
+            border: 1px solid var(--silver-dim);
+            color: var(--silver-mid);
+            text-decoration: none;
+            font-size: 0.75rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .link-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background: var(--silver);
+            box-shadow: 0 0 10px var(--silver);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .link-item::after {
+            content: '→';
+            position: absolute;
+            right: 20px;
+            color: var(--silver);
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .link-item:hover {
+            border-color: var(--silver);
+            color: var(--silver);
+            background: var(--silver-faint);
+            padding-left: 30px;
+            box-shadow: 0 0 20px rgba(192, 192, 192, 0.1);
+        }
+
+        .link-item:hover::before {
+            transform: scaleY(1);
+        }
+
+        .link-item:hover::after {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .link-item i {
+            font-size: 1rem;
+            width: 20px;
+        }
+
+        .divider {
+            width: 1px;
+            height: 60px;
+            background: linear-gradient(180deg, transparent, var(--silver-mid), transparent);
+            margin: 40px 0;
+        }
+
+        .socials {
+            display: flex;
+            gap: 12px;
+        }
+
+        .social-icon {
+            width: 44px;
+            height: 44px;
+            border: 1px solid var(--silver-dim);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--silver-mid);
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-icon:hover {
+            border-color: var(--silver);
+            color: var(--silver);
+            box-shadow: 0 0 25px rgba(192, 192, 192, 0.3);
+        }
+
+        .footer {
+            margin-top: 60px;
+            font-size: 0.55rem;
+            color: var(--silver-dim);
+            letter-spacing: 4px;
+        }
+
+        .corner-mark {
+            position: fixed;
+            width: 15px;
+            height: 15px;
+            border-color: var(--silver-dim);
+            border-style: solid;
+            z-index: 50;
+        }
+
+        .cm-tl {
+            top: 15px;
+            left: 15px;
+            border-width: 1px 0 0 1px;
+        }
+
+        .cm-tr {
+            top: 15px;
+            right: 15px;
+            border-width: 1px 1px 0 0;
+        }
+
+        .cm-bl {
+            bottom: 15px;
+            left: 15px;
+            border-width: 0 0 1px 1px;
+        }
+
+        .cm-br {
+            bottom: 15px;
+            right: 15px;
+            border-width: 0 1px 1px 0;
+        }
+
+        /* Screen shake */
+        .shake {
+            animation: shake 0.1s ease;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-2px);
+            }
+
+            75% {
+                transform: translateX(2px);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .link-item {
+                padding: 14px 20px;
+            }
+
+            .letter {
+                font-size: clamp(2rem, 12vw, 4rem);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="fighter" id="fighter">▲</div>
+    <div class="grid-bg" id="grid"></div>
+    <div class="noise" id="noise"></div>
+    <div class="vignette" id="vignette"></div>
+    <div class="glitch-overlay" id="glitchOverlay"></div>
+    <div class="glitch-lines" id="glitchLines"></div>
+    <canvas id="waveCanvas"></canvas>
+
+    <!-- BSOD Easter Egg -->
+    <div class="bsod" id="bsod">
+        <div class="bsod-sad">:(</div>
+        <div class="bsod-text">Your PC ran into a problem.</div>
+        <div class="bsod-small">Error: TOO_MUCH_DRIP_EXCEPTION</div>
+    </div>
+
+    <div class="corner-mark cm-tl"></div>
+    <div class="corner-mark cm-tr"></div>
+    <div class="corner-mark cm-bl"></div>
+    <div class="corner-mark cm-br"></div>
+
+    <div class="enter-screen" id="enterScreen">
+        <div class="enter-frame">
+            <div class="enter-text">ENTER</div>
+        </div>
+        <div class="enter-sub">[ CLICK TO ENTER ]</div>
+    </div>
+
+    <div class="main-page" id="mainPage">
+        <div class="name-container">
+            <div class="name" id="name"></div>
+        </div>
+
+        <p class="tagline"><span class="hl">18</span> // coder // poet // chaos</p>
+
+        <div class="bio">
+            <p>
+                welcome to my <span class="accent">digital void</span>.<br>
+                i write code that speaks &amp; poetry that compiles.<br>
+                <span class="accent">retro soul</span>. modern chaos.
+            </p>
+        </div>
+
+        <div class="links">
+            <a href="#" class="link-item"><i class="fab fa-instagram"></i><span>Instagram</span></a>
+            <a href="#" class="link-item"><i class="fab fa-spotify"></i><span>Spotify</span></a>
+            <a href="#" class="link-item"><i class="fab fa-github"></i><span>GitHub</span></a>
+            <a href="#" class="link-item"><i class="fab fa-x-twitter"></i><span>Twitter / X</span></a>
+            <a href="#" class="link-item"><i class="fas fa-pen-fancy"></i><span>Poetry</span></a>
+            <a href="#" class="link-item"><i class="fas fa-envelope"></i><span>Contact</span></a>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="socials">
+            <a href="#" class="social-icon"><i class="fab fa-discord"></i></a>
+            <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+            <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="social-icon"><i class="fab fa-telegram"></i></a>
+        </div>
+
+        <footer class="footer">&copy; 2025 ABHINABA</footer>
+    </div>
+
+    <audio id="bgAudio" loop preload="auto">
+        <source src="background_music.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Elements
+        const cursor = document.getElementById('cursor');
+        const cursorDot = document.getElementById('cursorDot');
+        const nameContainer = document.getElementById('name');
+        const grid = document.getElementById('grid');
+        const noise = document.getElementById('noise');
+        const glitchOverlay = document.getElementById('glitchOverlay');
+        const glitchLines = document.getElementById('glitchLines');
+        const bsod = document.getElementById('bsod');
+        const mainPage = document.getElementById('mainPage');
+        const waveCanvas = document.getElementById('waveCanvas');
+        const waveCtx = waveCanvas.getContext('2d');
+
+        // Canvas sizing
+        function resizeWave() {
+            waveCanvas.width = window.innerWidth;
+            waveCanvas.height = 150;
+        }
+        resizeWave();
+        window.addEventListener('resize', resizeWave);
+
+        // Create name letters
+        const nameText = 'ABHINABA';
+        nameText.split('').forEach((char, i) => {
+            const span = document.createElement('span');
+            span.className = 'letter';
+            span.textContent = char;
+            nameContainer.appendChild(span);
+        });
+        const letters = document.querySelectorAll('.letter');
+
+        // === RETRO SPACE SHOOTER ===
+        const fighter = document.getElementById('fighter');
+        const bullets = [];
+        const aliens = [];
+        const alienShapes = ['◇', '◈', '◆', '△', '▽', '○', '●', '□', '■', '☆', '★'];
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let gameStarted = false;
+
+        document.addEventListener('mousemove', e => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        function updateFighter() {
+            fighter.style.left = mouseX + 'px';
+            fighter.style.top = mouseY + 'px';
+            requestAnimationFrame(updateFighter);
+        }
+        updateFighter();
+
+        // Spawn bullet
+        function shootBullet() {
+            if (!gameStarted) return;
+            const bullet = document.createElement('div');
+            bullet.className = 'bullet';
+            bullet.style.left = mouseX + 'px';
+            bullet.style.top = (mouseY - 20) + 'px';
+            document.body.appendChild(bullet);
+            bullets.push({ el: bullet, x: mouseX, y: mouseY - 20 });
+        }
+
+        // Spawn alien
+        function spawnAlien() {
+            if (!gameStarted) return;
+            const alien = document.createElement('div');
+            alien.className = 'alien';
+            alien.textContent = alienShapes[Math.floor(Math.random() * alienShapes.length)];
+            alien.style.left = Math.random() * (window.innerWidth - 50) + 'px';
+            alien.style.top = Math.random() * (window.innerHeight - 200) + 'px';
+            document.body.appendChild(alien);
+            aliens.push({
+                el: alien,
+                x: parseFloat(alien.style.left),
+                y: parseFloat(alien.style.top),
+                vx: (Math.random() - 0.5) * 3,
+                vy: (Math.random() - 0.5) * 3
+            });
+
+            // Keep max aliens
+            if (aliens.length > 4) {
+                const old = aliens.shift();
+                old.el.remove();
+            }
+        }
+
+        // Explosion effect
+        function createExplosion(x, y) {
+            const exp = document.createElement('div');
+            exp.className = 'explosion';
+            exp.textContent = '💥';
+            exp.style.left = x + 'px';
+            exp.style.top = y + 'px';
+            document.body.appendChild(exp);
+            setTimeout(() => exp.remove(), 300);
+        }
+
+        // Game loop
+        function gameLoop() {
+            if (!gameStarted) return requestAnimationFrame(gameLoop);
+
+            // Update bullets
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                const b = bullets[i];
+                b.y -= 12;
+                b.el.style.top = b.y + 'px';
+
+                // Remove if off screen
+                if (b.y < -20) {
+                    b.el.remove();
+                    bullets.splice(i, 1);
+                    continue;
+                }
+
+                // Check collision with aliens
+                for (let j = aliens.length - 1; j >= 0; j--) {
+                    const a = aliens[j];
+                    const dx = b.x - a.x - 12;
+                    const dy = b.y - a.y - 12;
+                    if (Math.abs(dx) < 25 && Math.abs(dy) < 25) {
+                        createExplosion(a.x, a.y);
+                        a.el.remove();
+                        aliens.splice(j, 1);
+                        b.el.remove();
+                        bullets.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+
+            // Update aliens
+            aliens.forEach(a => {
+                a.x += a.vx;
+                a.y += a.vy;
+
+                // Bounce off walls
+                if (a.x < 0 || a.x > window.innerWidth - 30) a.vx *= -1;
+                if (a.y < 0 || a.y > window.innerHeight - 200) a.vy *= -1;
+
+                a.el.style.left = a.x + 'px';
+                a.el.style.top = a.y + 'px';
+            });
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Start shooting and spawning
+        function startGame() {
+            gameStarted = true;
+            setInterval(shootBullet, 150);
+            setInterval(spawnAlien, 2000);
+            spawnAlien();
+            spawnAlien();
+            spawnAlien();
+            gameLoop();
+        }
+
+        // === SPOOKY ASCII MONSTERS ===
+        let visitorIP = 'SCANNING...';
+
+        // Fetch visitor IP immediately
+        fetch('https://api.ipify.org?format=json')
+            .then(r => r.json())
+            .then(data => {
+                visitorIP = data.ip;
+                console.log('IP fetched:', visitorIP);
+            })
+            .catch(() => {
+                // Fallback API
+                fetch('https://ipinfo.io/json')
+                    .then(r => r.json())
+                    .then(data => { visitorIP = data.ip; })
+                    .catch(() => { visitorIP = '127.0.0.1'; });
+            });
+
+        const monsterArts = [
+            {
+                art: `
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣶⣶⣶⣶⣶⣶⣆⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⢀⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣄⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡆⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⣿⠋⠁⠀⣀⠀⢹⣿⣿⣿⠀⢀⡀⠀⠉⢻⡇⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⢹⣆⡀⠀⠉⠀⣾⡟⠙⣿⡄⠈⠁⠀⣀⣾⠁⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⢠⣿⡟⢯⣭⣾⣿⣀⣀⣻⣿⣮⣽⠛⢿⣧⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠸⣧⣄⠒⢠⣙⢛⡛⣛⣛⢛⡋⡄⣠⣴⡟⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⢀⣶⣦⡀⠙⠿⣷⣶⣭⣘⣃⣘⣃⣘⣥⣾⡿⠏⣡⣾⠟⠒⠀⠀⠀⠀
+⠀⠀⠀⠀⠂⠈⠙⠛⢶⣄⠀⠀⠛⡛⠛⠋⣛⠛⠃⠀⢀⣠⡿⠃⠀⠀⢦⡀⠀⠀
+⠀⠀⡠⠊⠀⠀⣴⠀⠀⠈⡟⠒⡤⠙⠿⠿⠁⠤⢶⠚⠉⠉⠀⢠⠁⠀⠀⠱⣄⠀
+⠀⢠⠁⠀⠀⠀⣿⡀⣀⣀⡁⠤⡇⢰⣷⣶⡄⣴⢼⠀⠀⢀⣠⢿⠀⠀⠀⠀⢹⡄
+⠰⢿⠀⠀⠀⢠⡉⠉⠀⠀⠀⡄⢺⢸⣿⣿⡇⡗⢺⢰⠈⠉⠀⠘⡆⠀⠀⠀⠀⡇
+⠀⠈⠳⣄⡀⢸⡇⠀⠀⠀⠀⣡⢚⢸⣿⣿⠇⠗⣆⠆⠀⠀⠀⠀⡇⠀⠀⢀⡴⠃
+⠀⠀⠀⠈⠃⠘⣷⣤⠀⠀⠀⢹⣾⣶⠒⠒⠀⢳⣧⣤⣄⣠⣄⣾⠃⢴⠆⠉⠀⠀
+⠀⠀⠀⠀⠀⠀⠈⠉⠉⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠀⠀⢉⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⢰⠀⢠⡟⠀⠀⠀⠀⢀⢄⠀⠀⠀⢸⡇⠀⠀⠨⡆⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⡘⢀⣜⠇⠀⠀⠀⠀⢸⠸⡀⠀⠀⢸⣿⠀⠀⠀⢡⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⡇⢸⣿⠀⠀⠀⠀⠠⡇⠀⡇⠀⠀⠈⣿⠀⠀⠀⢸⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠙⠛⠋⠤⠤⠤⠤⠄⠁⠀⠁⠤⠄⠠⠿⠧⠄⠛⠛⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⢀⣴⣶⣦⣄⠲⣶⠀⠀⠀⠀⠀⠀⠀⢠⣷⣶⡶⢂⣠⣴⣶⣤⡀⠀⠀
+⠀⠀⠀⠀⠸⠿⠿⠿⠿⠧⠠⠄⠀⠀⠀⠀⠀⠀⠤⠤⠤⠐⠿⠿⠿⠿⠿⠃⠀⠀
+            ` },
+            {
+                art: `
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣤⡶⠶⠿⠛⠛⠛⠛⠛⠶⠶⣦⣤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⢿⠟⠁⠀⠠⠀⠄⠀⠔⠂⠠⠄⠀⠀⠈⠙⠛⢶⡄⡀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⢀⣾⢿⢣⠏⠎⠀⠀⠀⠠⠀⢁⠊⠐⠀⡀⠉⠀⠀⠀⠀⠈⠛⣦⡄⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⢠⣿⠇⡎⢸⠸⡀⠁⡇⠀⡄⢂⠸⡀⠆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⣧⡀⠀
+⠀⠀⠀⠀⠀⠀⠀⢠⣿⢻⠀⡇⢸⡄⢿⠄⢃⠀⠐⡈⠠⠐⢄⠀⠂⠀⠀⠀⠀⠀⠐⠤⠈⢿⡄
+⠀⠀⠀⠀⠀⠀⠀⣼⣿⢸⠀⢷⠌⢷⡀⠳⣄⣂⠠⠌⠠⡈⠢⣈⠠⡁⢀⠐⠀⠀⠐⠀⠀⠈⣿
+⠀⠀⠀⠀⠀⠀⠀⣿⣿⠘⡖⡘⣾⣌⠻⣦⡀⠙⠳⢤⣀⠤⡑⢬⡀⠈⠠⠀⠈⠀⠀⠂⠀⠀⢸
+⠀⠀⠀⠀⠀⠀⠀⣿⣿⡇⢧⠠⣻⣼⡧⣄⡻⢧⣄⡀⠘⠻⢿⡤⣛⢤⠀⠀⠀⠀⣀⠃⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⢸⣆⢷⡌⢳⣌⠺⣝⡿⣿⣷⣮⣽⡳⢦⣄⠙⢮⠻⠄⠄⢀⠒⠠⠌⠄⠀⠀
+⠀⠀⠀⠀⢀⡜⢛⣿⡃⠀⢛⡤⠠⠤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⡾⠛⠉⠀⠀⠉⠉⠉
+⠀⠀⠀⣼⠏⠀⠀⠀⣈⡬⠤⠧⣐⠀⠄⠀⠳⣄⣸⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⢰⡏⠀⠀⢠⠏⠀⠀⠀⠀⠀⠙⢆⠂⡀⠸⠉⠙⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠸⡇⠀⠈⢸⡀⠀⠀⠀⠀⠀⠀⠈⢇⠠⠀⢻⣦⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ` }
+        ];
+
+        function spawnMonster() {
+            const fromLeft = Math.random() > 0.5;
+            const monster = monsterArts[Math.floor(Math.random() * monsterArts.length)];
+
+            const container = document.createElement('div');
+            container.className = 'monster-container';
+            container.style.top = (100 + Math.random() * (window.innerHeight - 400)) + 'px';
+            container.style.left = fromLeft ? '-300px' : (window.innerWidth + 50) + 'px';
+
+            const speech = document.createElement('div');
+            speech.className = 'monster-speech';
+            speech.innerHTML = `Hey dumbass, I got your IP!<br><span class="ip">${visitorIP}</span><br>lol, isn't it?`;
+
+            const art = document.createElement('div');
+            art.className = 'monster';
+            art.style.color = '#d0d0d0';
+            art.textContent = monster.art;
+
+            container.appendChild(speech);
+            container.appendChild(art);
+            document.body.appendChild(container);
+
+            // Animate across screen - slow and subtle
+            const duration = 15000 + Math.random() * 10000; // 15-25 seconds
+            container.style.opacity = '0.6';
+            const startX = fromLeft ? -300 : window.innerWidth + 50;
+            const endX = fromLeft ? window.innerWidth + 300 : -300;
+
+            let startTime = null;
+            function animateMonster(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const progress = (timestamp - startTime) / duration;
+
+                if (progress < 1) {
+                    const currentX = startX + (endX - startX) * progress;
+                    container.style.left = currentX + 'px';
+                    requestAnimationFrame(animateMonster);
+                } else {
+                    container.remove();
+                }
+            }
+            requestAnimationFrame(animateMonster);
+        }
+
+        // Spawn monsters periodically
+        function startMonsters() {
+            setTimeout(() => {
+                spawnMonster();
+                setInterval(spawnMonster, 20000); // Every 20 seconds - less intrusive
+            }, 5000); // First one after 5 seconds
+        }
+
+
+        // Audio
+        const audio = document.getElementById('bgAudio');
+        let audioContext, analyser, dataArray, source;
+
+        function initAudio() {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 256;
+            source = audioContext.createMediaElementSource(audio);
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+        }
+
+        // === GLITCH EFFECTS ===
+
+        // Create glitch lines
+        for (let i = 0; i < 20; i++) {
+            const line = document.createElement('div');
+            line.className = 'glitch-line';
+            line.style.top = Math.random() * 100 + '%';
+            line.style.opacity = Math.random() * 0.8;
+            line.style.height = (Math.random() * 4 + 1) + 'px';
+            glitchLines.appendChild(line);
+        }
+
+        // Random glitch trigger
+        function triggerGlitch() {
+            const glitchType = Math.floor(Math.random() * 5);
+
+            switch (glitchType) {
+                case 0: // Screen tear
+                    glitchLines.classList.add('active');
+                    glitchLines.querySelectorAll('.glitch-line').forEach(line => {
+                        line.style.transform = `translateX(${(Math.random() - 0.5) * 100}px)`;
+                        line.style.top = Math.random() * 100 + '%';
+                    });
+                    setTimeout(() => glitchLines.classList.remove('active'), 100);
+                    break;
+
+                case 1: // Quick blackout
+                    glitchOverlay.classList.add('active');
+                    setTimeout(() => glitchOverlay.classList.remove('active'), 50);
+                    break;
+
+                case 2: // Page distortion
+                    mainPage.classList.add('page-glitch');
+                    setTimeout(() => mainPage.classList.remove('page-glitch'), 200);
+                    break;
+
+                case 3: // Noise burst
+                    noise.style.opacity = '0.3';
+                    setTimeout(() => noise.style.opacity = '0.03', 100);
+                    break;
+
+                case 4: // BSOD flash (rare)
+                    if (Math.random() < 0.3) { // 30% chance when this case hits
+                        bsod.classList.add('active');
+                        setTimeout(() => bsod.classList.remove('active'), 300);
+                    }
+                    break;
+            }
+
+            // Schedule next glitch (random 2-8 seconds)
+            setTimeout(triggerGlitch, 2000 + Math.random() * 6000);
+        }
+
+        // Letter glitch effect
+        function glitchLetters() {
+            if (Math.random() < 0.15) { // 15% chance
+                const randomLetter = letters[Math.floor(Math.random() * letters.length)];
+                const originalColor = randomLetter.style.color;
+                randomLetter.style.transform = `translateX(${(Math.random() - 0.5) * 20}px) skewX(${(Math.random() - 0.5) * 20}deg)`;
+                randomLetter.style.opacity = Math.random();
+                setTimeout(() => {
+                    randomLetter.style.transform = '';
+                    randomLetter.style.opacity = '';
+                }, 100);
+            }
+            setTimeout(glitchLetters, 500 + Math.random() * 1500);
+        }
+
+        function visualize() {
+            if (!analyser) return requestAnimationFrame(visualize);
+
+            analyser.getByteFrequencyData(dataArray);
+
+            // Calculate frequency ranges
+            let bass = 0, mid = 0, high = 0;
+            const len = dataArray.length;
+            for (let i = 0; i < len; i++) {
+                if (i < len * 0.15) bass += dataArray[i];
+                else if (i < len * 0.5) mid += dataArray[i];
+                else high += dataArray[i];
+            }
+            bass = bass / (len * 0.15) / 255;
+            mid = mid / (len * 0.35) / 255;
+            high = high / (len * 0.5) / 255;
+
+            const intensity = (bass + mid + high) / 3;
+
+            // === LETTER EFFECTS ===
+            letters.forEach((letter, i) => {
+                const bounce = Math.sin(Date.now() / 100 + i) * bass * 15;
+                const scale = 1 + bass * 0.15;
+                const rotate = Math.sin(Date.now() / 200 + i * 0.5) * mid * 10;
+                const jitterX = (Math.random() - 0.5) * high * 5;
+                const jitterY = (Math.random() - 0.5) * high * 3;
+
+                letter.style.transform = `
+                    translateY(${bounce}px) 
+                    translateX(${jitterX}px)
+                    scale(${scale}) 
+                    rotate(${rotate}deg)
+                    skewX(${bass * 5}deg)
+                `;
+
+                const glow = 30 + intensity * 80;
+                letter.style.textShadow = `
+                    0 0 ${glow}px rgba(255,255,255,${0.5 + intensity * 0.5}),
+                    0 0 ${glow * 2}px rgba(208,208,208,${0.3 + intensity * 0.4}),
+                    0 0 ${glow * 3}px rgba(192,192,192,${intensity * 0.3})
+                `;
+            });
+
+            // Grid distortion on bass
+            grid.style.transform = `scale(${1 + bass * 0.02}) rotate(${bass * 0.5}deg)`;
+
+            // Screen shake on heavy bass
+            if (bass > 0.7) {
+                document.body.classList.add('shake');
+                setTimeout(() => document.body.classList.remove('shake'), 100);
+            }
+
+            // Trigger extra glitch on bass drop
+            if (bass > 0.8 && Math.random() < 0.3) {
+                triggerGlitch();
+            }
+
+            // === WAVE VISUALIZER ===
+            waveCtx.clearRect(0, 0, waveCanvas.width, waveCanvas.height);
+
+            const barWidth = waveCanvas.width / dataArray.length;
+            const gradient = waveCtx.createLinearGradient(0, waveCanvas.height, 0, 0);
+            gradient.addColorStop(0, 'rgba(208, 208, 208, 0)');
+            gradient.addColorStop(0.5, 'rgba(208, 208, 208, 0.2)');
+            gradient.addColorStop(1, 'rgba(208, 208, 208, 0.35)');
+
+            waveCtx.fillStyle = gradient;
+            waveCtx.beginPath();
+            waveCtx.moveTo(0, waveCanvas.height);
+
+            for (let i = 0; i < dataArray.length; i++) {
+                const barHeight = (dataArray[i] / 255) * waveCanvas.height;
+                const x = i * barWidth;
+                const y = waveCanvas.height - barHeight;
+
+                if (i === 0) {
+                    waveCtx.lineTo(x, y);
+                } else {
+                    const prevX = (i - 1) * barWidth;
+                    const cpX = (prevX + x) / 2;
+                    waveCtx.quadraticCurveTo(prevX, waveCanvas.height - (dataArray[i - 1] / 255) * waveCanvas.height, cpX, (y + (waveCanvas.height - (dataArray[i - 1] / 255) * waveCanvas.height)) / 2);
+                    waveCtx.lineTo(x, y);
+                }
+            }
+
+            waveCtx.lineTo(waveCanvas.width, waveCanvas.height);
+            waveCtx.closePath();
+            waveCtx.fill();
+
+            requestAnimationFrame(visualize);
+        }
+
+        // Enter handler
+        let entered = false;
+        document.getElementById('enterScreen').addEventListener('click', () => {
+            if (entered) return;
+            entered = true;
+
+            initAudio();
+            audio.volume = 0.5;
+            audio.play();
+
+            document.getElementById('enterScreen').classList.add('hidden');
+            mainPage.classList.add('active');
+
+            // Start effects
+            setTimeout(triggerGlitch, 3000);
+            setTimeout(glitchLetters, 2000);
+            startGame();
+            startMonsters();
+            visualize();
+        });
+
+        // Touch devices
+        if ('ontouchstart' in window) {
+            fighter.style.display = 'none';
+            document.body.style.cursor = 'auto';
+        }
+    </script>
+</body>
+
+</html>
