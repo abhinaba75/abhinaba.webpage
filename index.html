@@ -734,10 +734,8 @@
         <div class="divider"></div>
 
         <div class="socials">
-            <a href="#" class="social-icon"><i class="fab fa-discord"></i></a>
-            <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
-            <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
-            <a href="#" class="social-icon"><i class="fab fa-telegram"></i></a>
+            <a href="javascript:void(0)" onclick="copyDiscord()" class="social-icon"><i class="fab fa-discord"></i></a>
+            <a href="https://wa.me/" target="_blank" class="social-icon"><i class="fab fa-whatsapp"></i></a>
         </div>
 
         <footer class="footer">&copy; 2025 ABHINABA</footer>
@@ -1057,6 +1055,8 @@
         }
 
         // Random glitch trigger
+        let lastBsodTime = 0; // Track last BSOD time
+
         function triggerGlitch() {
             const glitchType = Math.floor(Math.random() * 5);
 
@@ -1085,8 +1085,10 @@
                     setTimeout(() => noise.style.opacity = '0.03', 100);
                     break;
 
-                case 4: // BSOD flash (rare)
-                    if (Math.random() < 0.3) { // 30% chance when this case hits
+                case 4: // BSOD flash (rare - 15 sec gap)
+                    const now = Date.now();
+                    if (now - lastBsodTime > 15000 && Math.random() < 0.3) {
+                        lastBsodTime = now;
                         bsod.classList.add('active');
                         setTimeout(() => bsod.classList.remove('active'), 300);
                     }
